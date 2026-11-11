@@ -1,0 +1,897 @@
+CTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS System 1.0 - El Assli Hi-Tech الأصلي هايتيك</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SheetJS (xlsx) for reading Excel & CSV files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- PDF.js for parsing text from PDF files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    
+    <!-- Google Fonts: Cairo & Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        assli: {
+                            blue: '#1e3a8a',
+                            lightBlue: '#2563eb',
+                            darkBlue: '#0f172a',
+                            accent: '#ff6600',
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+        @media print {
+            header, .no-print { display: none !important; }
+            main { padding: 0 !important; max-width: 100% !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar Header with El Assli Hi-Tech Official Branding -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo El Assli Hi-Tech & Title -->
+                <div class="flex items-center gap-4">
+                    <!-- SVG El Assli Hi-Tech Branding Logo -->
+                    <div class="flex items-center gap-3">
+                        <div class="relative w-12 h-12 flex items-center justify-center">
+                            <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-sm">
+                                <path d="M 15 15 L 45 15 L 45 45 L 55 45 L 55 15 L 85 15 L 85 85 L 55 85 L 55 55 L 45 55 L 45 85 L 15 85 Z" fill="#1e3a8a" />
+                                <path d="M 30 10 Q 50 -5 70 10" stroke="#1e3a8a" stroke-width="6" fill="none" stroke-linecap="round" />
+                                <path d="M 38 22 Q 50 12 62 22" stroke="#1e3a8a" stroke-width="5" fill="none" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-xl text-slate-900 tracking-tight font-inter">El Assli</span>
+                                <span class="font-extrabold text-sm bg-assli-blue text-white px-2 py-0.5 rounded-md font-inter tracking-wide">Hi-Tech</span>
+                            </div>
+                            <span class="font-bold text-xs text-assli-blue tracking-wider">الأصلي هايتيك • التدقيق والخدمات الذكية</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls & Lang Switcher -->
+                <div class="flex items-center gap-3">
+                    
+                    <!-- Language Switcher Toggle -->
+                    <div class="bg-slate-100 p-1 rounded-xl flex items-center gap-1 text-xs font-bold border border-slate-200">
+                        <button onclick="setLanguage('ar')" id="langArBtn" class="px-3 py-1.5 rounded-lg bg-white text-assli-blue shadow-sm transition">العربية</button>
+                        <button onclick="setLanguage('en')" id="langEnBtn" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">English</button>
+                    </div>
+
+                    <button onclick="window.print()" class="px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center gap-1.5 border border-slate-300">
+                        <i class="fa-solid fa-print"></i>
+                        <span data-i18n="printReport">طباعة</span>
+                    </button>
+                    
+                    <button id="exportBtn" onclick="exportReport()" disabled class="px-4 py-2 text-xs font-bold text-white bg-slate-400 cursor-not-allowed rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span data-i18n="exportReport">تصدير التقرير</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main App Layout -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+        <!-- System Controls & AI Matching Settings -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm no-print">
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+                
+                <!-- AI Sensitivity & Checkers -->
+                <div class="flex flex-wrap items-center gap-4">
+                    
+                    <!-- Sensitivity Range -->
+                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+                        <i class="fa-solid fa-microchip text-assli-blue text-sm"></i>
+                        <span class="text-xs font-bold text-slate-700" data-i18n="aiThreshold">حساسية مطابقة الذكاء الاصطناعي:</span>
+                        <input type="range" id="thresholdRange" min="65" max="100" value="80" onchange="updateThreshold(this.value)" class="w-24 accent-assli-blue cursor-pointer">
+                        <span id="thresholdVal" class="text-xs font-bold text-assli-blue bg-blue-50 px-2 py-0.5 rounded-md">80%</span>
+                    </div>
+
+                    <!-- AI Verification Switches -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <label class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 cursor-pointer">
+                            <input type="checkbox" id="checkArchived" checked onchange="processAuditData()" class="rounded border-slate-300 text-assli-blue focus:ring-assli-blue">
+                            <span data-i18n="checkArchivedText">التحقق من حالة الإعلانات المؤرشفة (Ouedkniss Archived)</span>
+                        </label>
+
+                        <label class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 cursor-pointer">
+                            <input type="checkbox" id="checkSerials" checked onchange="processAuditData()" class="rounded border-slate-300 text-assli-blue focus:ring-assli-blue">
+                            <span data-i18n="checkSerialsText">فحص السيريال والموديل (Serial / MPN)</span>
+                        </label>
+                    </div>
+
+                </div>
+
+                <!-- Reset Controls -->
+                <div class="flex items-center justify-end">
+                    <button onclick="resetSession()" class="text-xs text-rose-600 hover:text-rose-800 font-bold px-3 py-1.5 rounded-lg hover:bg-rose-50 transition border border-transparent hover:border-rose-200">
+                        <i class="fa-solid fa-rotate-left"></i> <span data-i18n="resetData">إعادة رفع واستبدال البيانات</span>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Step 1: Upload Documents (XLSX, CSV, PDF) -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
+            
+            <!-- 1. CRM File Upload Card -->
+            <div class="bg-white border-2 border-dashed border-slate-300 hover:border-assli-blue rounded-2xl p-5 transition-all duration-200 shadow-sm relative group">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-assli-blue flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-file-invoice text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm" data-i18n="crmTitle">1. ملف مخزون الـ CRM / الفواتير</h3>
+                            <p class="text-xs text-slate-500" data-i18n="crmDesc">مخزون حواسيب وقطع الأصلي هايتيك</p>
+                        </div>
+                    </div>
+                    <span id="crmStatusBadge" class="hidden text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        <i class="fa-solid fa-check text-xs"></i> <span data-i18n="loaded">تم التحميل</span>
+                    </span>
+                </div>
+
+                <div class="mt-2 flex flex-col items-center justify-center border border-slate-200 rounded-xl p-5 bg-slate-50/50 hover:bg-white transition cursor-pointer relative" onclick="document.getElementById('crmFileInput').click()">
+                    <input type="file" id="crmFileInput" accept=".xlsx, .xls, .csv, .pdf" class="hidden" onchange="handleFileUpload(event, 'crm')">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 mb-2 group-hover:scale-110 group-hover:text-assli-blue transition-all duration-200"></i>
+                    <p class="text-xs font-bold text-slate-700 mb-1" id="crmFileName" data-i18n="uploadPrompt">اضغط هنا لرفع الملف (XLSX, CSV, PDF)</p>
+                    <p class="text-[11px] text-slate-400" data-i18n="columnsSupported">يتعرف آلياً على أعمدة: SKU, Name, Serial, Price, Stock</p>
+                </div>
+            </div>
+
+            <!-- 2. Ouedkniss File Upload Card -->
+            <div class="bg-white border-2 border-dashed border-slate-300 hover:border-orange-500 rounded-2xl p-5 transition-all duration-200 shadow-sm relative group">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-orange-50 text-assli-accent flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-store text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm" data-i18n="storeTitle">2. ملف إعلانات واد كنيس (Ouedkniss)</h3>
+                            <p class="text-xs text-slate-500" data-i18n="storeDesc">قائمة الإعلانات المنشورة والمؤرشفة أونلاين</p>
+                        </div>
+                    </div>
+                    <span id="storeStatusBadge" class="hidden text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        <i class="fa-solid fa-check text-xs"></i> <span data-i18n="loaded">تم التحميل</span>
+                    </span>
+                </div>
+
+                <div class="mt-2 flex flex-col items-center justify-center border border-slate-200 rounded-xl p-5 bg-slate-50/50 hover:bg-white transition cursor-pointer relative" onclick="document.getElementById('storeFileInput').click()">
+                    <input type="file" id="storeFileInput" accept=".xlsx, .xls, .csv, .pdf" class="hidden" onchange="handleFileUpload(event, 'store')">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 mb-2 group-hover:scale-110 group-hover:text-orange-500 transition-all duration-200"></i>
+                    <p class="text-xs font-bold text-slate-700 mb-1" id="storeFileName" data-i18n="uploadPrompt">اضغط هنا لرفع الملف (XLSX, CSV, PDF)</p>
+                    <p class="text-[11px] text-slate-400" data-i18n="storeColumnsSupported">يتعرف آلياً على أعمدة: Title, Price, Status, Ref</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Summary KPIs Dashboard Cards -->
+        <section id="kpiSection" class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+            
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between text-slate-500 mb-2">
+                    <span class="text-xs font-bold text-slate-600" data-i18n="kpiTotal">إجمالي الـ CRM</span>
+                    <i class="fa-solid fa-boxes-stacked text-assli-blue"></i>
+                </div>
+                <div>
+                    <span id="kpiTotalCrm" class="text-2xl font-extrabold text-slate-900">0</span>
+                    <span class="text-xs text-slate-500 mr-1" data-i18n="unitProduct">منتج</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-rose-200 shadow-sm flex flex-col justify-between bg-rose-50/20">
+                <div class="flex items-center justify-between text-rose-600 mb-2">
+                    <span class="text-xs font-bold text-rose-800" data-i18n="kpiUnposted">غير منشورة أونلاين</span>
+                    <i class="fa-solid fa-eye-slash text-rose-600"></i>
+                </div>
+                <div>
+                    <span id="kpiUnposted" class="text-2xl font-extrabold text-rose-600">0</span>
+                    <span class="text-xs text-rose-500 mr-1" data-i18n="unitMissing">غير مضاف</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-amber-200 shadow-sm flex flex-col justify-between bg-amber-50/20">
+                <div class="flex items-center justify-between text-amber-600 mb-2">
+                    <span class="text-xs font-bold text-amber-800" data-i18n="kpiMismatch">اختلاف الأسعار</span>
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                </div>
+                <div>
+                    <span id="kpiMismatch" class="text-2xl font-extrabold text-amber-600">0</span>
+                    <span class="text-xs text-amber-500 mr-1" data-i18n="unitError">خطأ بالسعر</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-300 shadow-sm flex flex-col justify-between bg-slate-100/50">
+                <div class="flex items-center justify-between text-slate-600 mb-2">
+                    <span class="text-xs font-bold text-slate-700" data-i18n="kpiArchived">مؤرشف في واد كنيس</span>
+                    <i class="fa-solid fa-box-archive text-slate-600"></i>
+                </div>
+                <div>
+                    <span id="kpiArchived" class="text-2xl font-extrabold text-slate-800">0</span>
+                    <span class="text-xs text-slate-500 mr-1" data-i18n="unitArchived">إعلان غير مفعّل</span>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-assli-blue to-slate-900 p-4 rounded-2xl text-white shadow-md flex flex-col justify-between col-span-2 lg:col-span-1">
+                <div class="flex items-center justify-between text-blue-200 mb-2">
+                    <span class="text-xs font-bold" data-i18n="kpiRisk">تقدير فارق الأسعار</span>
+                    <i class="fa-solid fa-coins text-amber-400"></i>
+                </div>
+                <div>
+                    <span id="kpiFinancialRisk" class="text-xl font-extrabold text-amber-400">0 DA</span>
+                    <p class="text-[10px] text-blue-200/80 mt-1" data-i18n="kpiRiskSub">إجمالي الفارق بالسعر المعروض بأقل</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Main Results Data Table -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col flex-1">
+            
+            <!-- Table Controls Bar -->
+            <div class="p-4 border-b border-slate-200 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-slate-50/50 no-print">
+                
+                <!-- Filter Tabs -->
+                <div class="flex items-center bg-slate-200/70 p-1 rounded-xl gap-1 text-xs font-bold overflow-x-auto max-w-full custom-scrollbar">
+                    <button onclick="setFilter('ALL')" id="filterTabALL" class="px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm transition">
+                        <span data-i18n="filterAll">الكل</span> (<span id="countAll">0</span>)
+                    </button>
+                    <button onclick="setFilter('UNPOSTED')" id="filterTabUNPOSTED" class="px-3 py-1.5 rounded-lg text-slate-600 transition flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                        <span data-i18n="filterUnposted">غير منشور</span> (<span id="countUnposted">0</span>)
+                    </button>
+                    <button onclick="setFilter('MISMATCH')" id="filterTabMISMATCH" class="px-3 py-1.5 rounded-lg text-slate-600 transition flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <span data-i18n="filterMismatch">اختلاف السعر</span> (<span id="countMismatch">0</span>)
+                    </button>
+                    <button onclick="setFilter('ARCHIVED')" id="filterTabARCHIVED" class="px-3 py-1.5 rounded-lg text-slate-600 transition flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                        <span data-i18n="filterArchived">مؤرشف</span> (<span id="countArchived">0</span>)
+                    </button>
+                    <button onclick="setFilter('OK')" id="filterTabOK" class="px-3 py-1.5 rounded-lg text-slate-600 transition flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span data-i18n="filterOk">مطابق</span> (<span id="countOk">0</span>)
+                    </button>
+                </div>
+
+                <!-- Search Field -->
+                <div class="relative min-w-[240px]">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs rtl:right-3.5 ltr:left-3.5"></i>
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="البحث برقم السيريال، SKU، الاسم..." class="w-full pl-4 pr-9 py-2 text-xs bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-assli-blue transition rtl:pr-9 rtl:pl-4 ltr:pl-9 ltr:pr-4" data-i18n-placeholder="searchPlaceholder">
+                </div>
+
+            </div>
+
+            <!-- Table Body -->
+            <div class="overflow-x-auto custom-scrollbar flex-1">
+                <table class="w-full text-right text-xs rtl:text-right ltr:text-left">
+                    <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider sticky top-0 z-10">
+                        <tr>
+                            <th class="py-3.5 px-4" data-i18n="thSku">SKU / السيريال</th>
+                            <th class="py-3.5 px-4" data-i18n="thTitle">اسم القطعة أو الحاسوب</th>
+                            <th class="py-3.5 px-4" data-i18n="thStock">المخزون</th>
+                            <th class="py-3.5 px-4" data-i18n="thCrmPrice">سعر الـ CRM</th>
+                            <th class="py-3.5 px-4" data-i18n="thStorePrice">سعر واد كنيس</th>
+                            <th class="py-3.5 px-4" data-i18n="thDiff">الفارق</th>
+                            <th class="py-3.5 px-4" data-i18n="thStatus">الحالة في واد كنيس</th>
+                            <th class="py-3.5 px-4 text-center no-print" data-i18n="thActions">الإجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody" class="divide-y divide-slate-200 font-medium">
+                        <!-- Empty Prompt View -->
+                        <tr>
+                            <td colspan="8" class="py-16 text-center text-slate-400">
+                                <div class="flex flex-col items-center justify-center gap-3">
+                                    <div class="w-16 h-16 rounded-full bg-blue-50 text-assli-blue flex items-center justify-center text-2xl">
+                                        <i class="fa-solid fa-file-circle-plus"></i>
+                                    </div>
+                                    <p class="font-bold text-slate-700 text-sm" data-i18n="emptyStateTitle">نظام مطابقة الأصلي هايتيك جاهز للفحص</p>
+                                    <p class="text-xs text-slate-400" data-i18n="emptyStateSub">يرجى رفع ملف CRM وملف إعلانات واد كنيس للبدء بالمقارنة فوراً</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Footer Status Bar -->
+            <div class="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                <span id="tableSummaryText">إجمالي السجلات: 0</span>
+                <span class="flex items-center gap-1.5 text-[11px] text-slate-400">
+                    <i class="fa-solid fa-shield-halved text-assli-blue"></i>
+                    <span>نظام فحص ذكي محمي - El Assli Hi-Tech Audit System</span>
+                </span>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- JavaScript Application Engine -->
+    <script>
+        // Language Translations Object
+        const i18n = {
+            ar: {
+                printReport: "طباعة",
+                exportReport: "تصدير التقرير",
+                aiThreshold: "حساسية مطابقة الذكاء الاصطناعي:",
+                checkArchivedText: "التحقق من حالة الإعلانات المؤرشفة (Ouedkniss Archived)",
+                checkSerialsText: "فحص السيريال والموديل (Serial / MPN)",
+                resetData: "إعادة رفع واستبدال البيانات",
+                crmTitle: "1. ملف مخزون الـ CRM / الفواتير",
+                crmDesc: "مخزون حواسيب وقطع الأصلي هايتيك",
+                storeTitle: "2. ملف إعلانات واد كنيس (Ouedkniss)",
+                storeDesc: "قائمة الإعلانات المنشورة والمؤرشفة أونلاين",
+                loaded: "تم التحميل",
+                uploadPrompt: "اضغط هنا لرفع الملف (XLSX, CSV, PDF)",
+                columnsSupported: "يتعرف آلياً على أعمدة: SKU, Name, Serial, Price, Stock",
+                storeColumnsSupported: "يتعرف آلياً على أعمدة: Title, Price, Status, Ref",
+                kpiTotal: "إجمالي الـ CRM",
+                unitProduct: "منتج",
+                kpiUnposted: "غير منشورة أونلاين",
+                unitMissing: "غير مضاف",
+                kpiMismatch: "اختلاف الأسعار",
+                unitError: "خطأ بالسعر",
+                kpiArchived: "مؤرشف في واد كنيس",
+                unitArchived: "إعلان غير مفعّل",
+                kpiRisk: "تقدير فارق الأسعار",
+                kpiRiskSub: "إجمالي الفارق بالسعر المعروض بأقل",
+                filterAll: "الكل",
+                filterUnposted: "غير منشور",
+                filterMismatch: "اختلاف السعر",
+                filterArchived: "مؤرشف",
+                filterOk: "مطابق",
+                searchPlaceholder: "البحث برقم السيريال، SKU، الاسم...",
+                thSku: "SKU / السيريال",
+                thTitle: "اسم القطعة أو الحاسوب",
+                thStock: "المخزون",
+                thCrmPrice: "سعر الـ CRM",
+                thStorePrice: "سعر واد كنيس",
+                thDiff: "الفارق",
+                thStatus: "الحالة في واد كنيس",
+                thActions: "الإجراء",
+                emptyStateTitle: "نظام مطابقة الأصلي هايتيك جاهز للفحص",
+                emptyStateSub: "يرجى رفع ملف CRM وملف إعلانات واد كنيس للبدء بالمقارنة فوراً"
+            },
+            en: {
+                printReport: "Print Report",
+                exportReport: "Export Report",
+                aiThreshold: "AI Match Sensitivity:",
+                checkArchivedText: "Verify Ouedkniss Archived Status",
+                checkSerialsText: "Inspect Serial / MPN / Model",
+                resetData: "Reset Uploaded Data",
+                crmTitle: "1. CRM Inventory / Invoices File",
+                crmDesc: "El Assli Hi-Tech Hardware Inventory",
+                storeTitle: "2. Ouedkniss Ads File",
+                storeDesc: "Active & Archived Online Listings",
+                loaded: "Loaded",
+                uploadPrompt: "Click to upload file (XLSX, CSV, PDF)",
+                columnsSupported: "Auto-detects: SKU, Name, Serial, Price, Stock",
+                storeColumnsSupported: "Auto-detects: Title, Price, Status, Ref",
+                kpiTotal: "Total CRM Items",
+                unitProduct: "items",
+                kpiUnposted: "Missing Online",
+                unitMissing: "unposted",
+                kpiMismatch: "Price Discrepancies",
+                unitError: "price error",
+                kpiArchived: "Archived Ads",
+                unitArchived: "inactive ads",
+                kpiRisk: "Estimated Risk Loss",
+                kpiRiskSub: "Sum of underpriced online listings",
+                filterAll: "All",
+                filterUnposted: "Missing Online",
+                filterMismatch: "Price Mismatch",
+                filterArchived: "Archived",
+                filterOk: "Match OK",
+                searchPlaceholder: "Search Serial, SKU, Product Title...",
+                thSku: "SKU / Serial",
+                thTitle: "Hardware Component / Laptop",
+                thStock: "Stock",
+                thCrmPrice: "CRM Price",
+                thStorePrice: "Ouedkniss Price",
+                thDiff: "Difference",
+                thStatus: "Ouedkniss Status",
+                thActions: "Action",
+                emptyStateTitle: "El Assli Hi-Tech Audit System Ready",
+                emptyStateSub: "Please upload your CRM and Ouedkniss files to start reconciliation."
+            }
+        };
+
+        // Application Global State
+        let currentLang = 'ar';
+        let rawCrmData = [];
+        let rawStoreData = [];
+        let auditResults = [];
+        let resolvedSkus = new Set();
+        let currentFilter = 'ALL';
+        let matchThreshold = 80;
+
+        // Switch Language Engine (AR / EN)
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+            // Buttons Highlight
+            document.getElementById('langArBtn').className = lang === 'ar' 
+                ? "px-3 py-1.5 rounded-lg bg-white text-assli-blue shadow-sm transition font-bold" 
+                : "px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition font-bold";
+            document.getElementById('langEnBtn').className = lang === 'en' 
+                ? "px-3 py-1.5 rounded-lg bg-white text-assli-blue shadow-sm transition font-bold" 
+                : "px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition font-bold";
+
+            // Translate I18n Attributes
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) el.innerText = i18n[lang][key];
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (i18n[lang][key]) el.placeholder = i18n[lang][key];
+            });
+
+            if (auditResults.length > 0) applyFilters();
+        }
+
+        function updateThreshold(val) {
+            matchThreshold = parseInt(val);
+            document.getElementById('thresholdVal').innerText = `${val}%`;
+            if (rawCrmData.length > 0) processAuditData();
+        }
+
+        // Levenshtein AI String Similarity Algorithm
+        function calculateSimilarity(str1, str2) {
+            const s1 = String(str1).toLowerCase().replace(/[^a-z0-9]/g, '');
+            const s2 = String(str2).toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (s1 === s2) return 100;
+            if (!s1 || !s2) return 0;
+
+            const track = Array(s2.length + 1).fill(null).map(() => Array(s1.length + 1).fill(null));
+            for (let i = 0; i <= s1.length; i += 1) track[0][i] = i;
+            for (let j = 0; j <= s2.length; j += 1) track[j][0] = j;
+
+            for (let j = 1; j <= s2.length; j += 1) {
+                for (let i = 1; i <= s1.length; i += 1) {
+                    const indicator = s1[i - 1] === s2[j - 1] ? 0 : 1;
+                    track[j][i] = Math.min(
+                        track[j][i - 1] + 1,
+                        track[j - 1][i] + 1,
+                        track[j - 1][i - 1] + indicator
+                    );
+                }
+            }
+            const distance = track[s2.length][s1.length];
+            const maxLen = Math.max(s1.length, s2.length);
+            return Math.round(((maxLen - distance) / maxLen) * 100);
+        }
+
+        // File Handler for Excel, CSV, and PDF
+        async function handleFileUpload(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileName = file.name;
+            const ext = fileName.split('.').pop().toLowerCase();
+
+            try {
+                let parsedRows = [];
+
+                if (ext === 'pdf') {
+                    parsedRows = await parsePdfFile(file);
+                } else {
+                    parsedRows = await parseExcelCsvFile(file);
+                }
+
+                if (type === 'crm') {
+                    rawCrmData = parseColumnsFlexibly(parsedRows, 'crm');
+                    document.getElementById('crmStatusBadge').classList.remove('hidden');
+                    document.getElementById('crmFileName').innerText = `${fileName} (${rawCrmData.length})`;
+                } else {
+                    rawStoreData = parseColumnsFlexibly(parsedRows, 'store');
+                    document.getElementById('storeStatusBadge').classList.remove('hidden');
+                    document.getElementById('storeFileName').innerText = `${fileName} (${rawStoreData.length})`;
+                }
+
+                if (rawCrmData.length > 0) processAuditData();
+
+            } catch (err) {
+                alert(currentLang === 'ar' ? "حدث خطأ أثناء قراءة الملف. يرجى التثبت من الملف." : "Error reading file. Please check format.");
+            }
+        }
+
+        // Parse Excel & CSV Files via SheetJS
+        function parseExcelCsvFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet);
+                        resolve(jsonData);
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Parse Text lines & PDF Tables via PDF.js
+        async function parsePdfFile(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let extractedRows = [];
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const lines = textContent.items.map(item => item.str).join(" ").split("\n");
+                
+                lines.forEach(line => {
+                    if (line.trim().length > 5) {
+                        extractedRows.push({ "RawLine": line.trim() });
+                    }
+                });
+            }
+
+            // Convert PDF lines to structured fields using regex
+            return extractedRows.map(row => {
+                const text = row.RawLine || "";
+                const priceMatch = text.match(/(\d[\d\s,.]*\d)\s*(DA|د.ج|DZD)/i) || text.match(/\b\d{4,7}\b/);
+                const skuMatch = text.match(/\b[A-Z0-9]{4,15}-[A-Z0-9-]+\b/i) || text.match(/\b[A-Z0-9]{6,12}\b/);
+                
+                return {
+                    SKU: skuMatch ? skuMatch[0] : "",
+                    Title: text.replace(priceMatch ? priceMatch[0] : "", "").trim(),
+                    Price: priceMatch ? priceMatch[0] : 0,
+                    Stock: 1
+                };
+            });
+        }
+
+        // Smart Column Mapping Parser (Arabic, French, English)
+        function parseColumnsFlexibly(data, type) {
+            return data.map(item => {
+                const keys = Object.keys(item);
+                
+                const skuKey = keys.find(k => /sku|serial|ref|code|رمز|سيريال/i.test(k)) || keys[0];
+                const titleKey = keys.find(k => /title|name|nom|اسم|منتج|article|désignation/i.test(k)) || keys[1];
+                const priceKey = keys.find(k => /price|prix|سعر|tarif/i.test(k)) || keys[2];
+                const stockKey = keys.find(k => /stock|qty|quantité|كمية/i.test(k));
+                const statusKey = keys.find(k => /status|statut|حالة|etat|archived/i.test(k));
+
+                const skuVal = String(item[skuKey] || '').trim();
+                const titleVal = String(item[titleKey] || 'بدون اسم').trim();
+                const priceVal = parseFloat(String(item[priceKey] || 0).replace(/[^0-9.]/g, '')) || 0;
+                const stockVal = stockKey ? parseInt(item[stockKey]) || 0 : 1;
+                
+                const rawStatus = statusKey ? String(item[statusKey]).toLowerCase() : 'active';
+                const isArchived = /archived|مؤرشف|désactivé|closed|draft/i.test(rawStatus);
+
+                return {
+                    SKU: skuVal,
+                    Title: titleVal,
+                    Price: priceVal,
+                    Stock: stockVal,
+                    IsArchived: isArchived,
+                    StatusText: isArchived ? (currentLang === 'ar' ? 'مؤرشف' : 'Archived') : (currentLang === 'ar' ? 'منشور' : 'Active')
+                };
+            });
+        }
+
+        // Core Audit & Multi-Criteria Engine
+        function processAuditData() {
+            const checkArchived = document.getElementById('checkArchived').checked;
+            const checkSerials = document.getElementById('checkSerials').checked;
+
+            let totalLossRisk = 0;
+
+            auditResults = rawCrmData.map(crm => {
+                let match = null;
+                let matchType = 'EXACT_SKU';
+                let similarity = 100;
+
+                // 1. Match by SKU / Serial Number
+                if (crm.SKU && checkSerials) {
+                    match = rawStoreData.find(s => s.SKU && s.SKU.toUpperCase() === crm.SKU.toUpperCase());
+                }
+
+                // 2. Match by AI Fuzzy Title algorithm
+                if (!match && crm.Title) {
+                    let bestMatch = null;
+                    let highestScore = 0;
+
+                    rawStoreData.forEach(store => {
+                        const score = calculateSimilarity(crm.Title, store.Title);
+                        if (score >= matchThreshold && score > highestScore) {
+                            highestScore = score;
+                            bestMatch = store;
+                        }
+                    });
+
+                    if (bestMatch) {
+                        match = bestMatch;
+                        matchType = 'AI_TITLE';
+                        similarity = highestScore;
+                    }
+                }
+
+                const isResolved = resolvedSkus.has(crm.SKU || crm.Title);
+
+                // Unposted / Missing online
+                if (!match) {
+                    return {
+                        ...crm,
+                        StorePrice: null,
+                        Diff: null,
+                        Status: isResolved ? 'RESOLVED' : 'UNPOSTED',
+                        StatusLabel: currentLang === 'ar' ? 'غير منشور على واد كنيس' : 'Missing on Ouedkniss',
+                        Note: currentLang === 'ar' ? 'المنتج بمخزونك ولم ينشر أونلاين' : 'In stock, missing online listing'
+                    };
+                }
+
+                // Archived Ad Check on Ouedkniss
+                if (checkArchived && match.IsArchived) {
+                    return {
+                        ...crm,
+                        StorePrice: match.Price,
+                        Diff: crm.Price - match.Price,
+                        Status: isResolved ? 'RESOLVED' : 'ARCHIVED',
+                        StatusLabel: currentLang === 'ar' ? 'إعلان مؤرشف في واد كنيس' : 'Archived Listing',
+                        Note: currentLang === 'ar' ? 'الإعلان موجود على واد كنيس لكنه مؤرشف/مغلق' : 'Ouedkniss listing is currently archived/inactive'
+                    };
+                }
+
+                // Price Discrepancy Check
+                const priceDiff = crm.Price - match.Price;
+
+                if (Math.abs(priceDiff) > 0.01) {
+                    if (priceDiff > 0) totalLossRisk += priceDiff;
+
+                    return {
+                        ...crm,
+                        StorePrice: match.Price,
+                        Diff: priceDiff,
+                        Status: isResolved ? 'RESOLVED' : 'MISMATCH',
+                        StatusLabel: currentLang === 'ar' ? 'اختلاف في السعر' : 'Price Mismatch',
+                        Note: priceDiff > 0 
+                            ? (currentLang === 'ar' ? `سعر واد كنيس أقل بـ ${Math.abs(priceDiff).toLocaleString()} DA` : `Ouedkniss price lower by ${Math.abs(priceDiff).toLocaleString()} DA`)
+                            : (currentLang === 'ar' ? `سعر واد كنيس أعلى بـ ${Math.abs(priceDiff).toLocaleString()} DA` : `Ouedkniss price higher by ${Math.abs(priceDiff).toLocaleString()} DA`)
+                    };
+                }
+
+                // Perfect Match
+                return {
+                    ...crm,
+                    StorePrice: match.Price,
+                    Diff: 0,
+                    Status: isResolved ? 'RESOLVED' : 'OK',
+                    StatusLabel: currentLang === 'ar' ? 'مطابق ومفعّل' : 'Active & Matching',
+                    Note: currentLang === 'ar' ? 'البيانات والسعر متطابقين تماماً' : 'Data and price perfectly matching'
+                };
+            });
+
+            updateKpis(totalLossRisk);
+            applyFilters();
+
+            const exportBtn = document.getElementById('exportBtn');
+            exportBtn.disabled = false;
+            exportBtn.className = "px-4 py-2 text-xs font-bold text-white bg-assli-blue hover:bg-assli-lightBlue rounded-xl transition flex items-center gap-1.5 shadow-md cursor-pointer";
+        }
+
+        function updateKpis(totalLossRisk) {
+            const total = auditResults.length;
+            const unposted = auditResults.filter(r => r.Status === 'UNPOSTED').length;
+            const mismatch = auditResults.filter(r => r.Status === 'MISMATCH').length;
+            const archived = auditResults.filter(r => r.Status === 'ARCHIVED').length;
+
+            document.getElementById('kpiTotalCrm').innerText = total.toLocaleString();
+            document.getElementById('kpiUnposted').innerText = unposted.toLocaleString();
+            document.getElementById('kpiMismatch').innerText = mismatch.toLocaleString();
+            document.getElementById('kpiArchived').innerText = archived.toLocaleString();
+            document.getElementById('kpiFinancialRisk').innerText = `${totalLossRisk.toLocaleString()} DA`;
+
+            document.getElementById('countAll').innerText = total;
+            document.getElementById('countUnposted').innerText = unposted;
+            document.getElementById('countMismatch').innerText = mismatch;
+            document.getElementById('countArchived').innerText = archived;
+            document.getElementById('countOk').innerText = auditResults.filter(r => r.Status === 'OK').length;
+        }
+
+        function setFilter(type) {
+            currentFilter = type;
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            const filtered = auditResults.filter(item => {
+                const matchStatus = (currentFilter === 'ALL') || (item.Status === currentFilter);
+                const matchSearch = (item.SKU && item.SKU.toLowerCase().includes(searchVal)) || 
+                                    (item.Title && item.Title.toLowerCase().includes(searchVal));
+                return matchStatus && matchSearch;
+            });
+
+            renderTable(filtered);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('auditTableBody');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="py-12 text-center text-slate-400">
+                            <i class="fa-solid fa-filter text-2xl mb-2 text-slate-300"></i>
+                            <p class="font-bold text-slate-600 text-xs">${currentLang === 'ar' ? 'لا توجد نتائج تطابق البحث والتصفية' : 'No matching results'}</p>
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('tableSummaryText').innerText = `إجمالي المعروض: 0`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(row => {
+                let badgeClass = "";
+                let diffText = "-";
+                let storePriceText = row.StorePrice ? `${row.StorePrice.toLocaleString()} DA` : '<span class="text-slate-400">N/A</span>';
+
+                if (row.Status === 'UNPOSTED') {
+                    badgeClass = "bg-rose-100 text-rose-800 border-rose-200";
+                } else if (row.Status === 'MISMATCH') {
+                    badgeClass = "bg-amber-100 text-amber-800 border-amber-200";
+                    const formattedDiff = Math.abs(row.Diff).toLocaleString();
+                    diffText = row.Diff > 0 
+                        ? `<span class="text-rose-600 font-bold">-${formattedDiff} DA</span>` 
+                        : `<span class="text-emerald-600 font-bold">+${formattedDiff} DA</span>`;
+                } else if (row.Status === 'ARCHIVED') {
+                    badgeClass = "bg-slate-200 text-slate-800 border-slate-300";
+                } else {
+                    badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                    diffText = `<span class="text-slate-400">0 DA</span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 animate-fade-in">
+                        <td class="py-3 px-4 font-mono font-bold text-slate-900">
+                            ${row.SKU ? row.SKU : '<span class="text-slate-400 text-[10px]">N/A</span>'}
+                        </td>
+                        <td class="py-3 px-4 font-bold text-slate-900 max-w-xs">
+                            <div class="truncate" title="${row.Title}">${row.Title}</div>
+                            <div class="text-[10px] text-slate-400 mt-0.5">${row.Note}</div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${row.Stock === 0 ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700'}">
+                                ${row.Stock}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 font-bold text-slate-900">${row.Price.toLocaleString()} DA</td>
+                        <td class="py-3 px-4 font-bold">${storePriceText}</td>
+                        <td class="py-3 px-4">${diffText}</td>
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${badgeClass}">
+                                ${row.StatusLabel}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center no-print">
+                            <button onclick="toggleResolved('${escape(row.SKU || row.Title)}')" class="px-2 py-1 text-[11px] font-bold rounded-lg border bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                                ${row.Status === 'RESOLVED' ? (currentLang === 'ar' ? 'تراجع' : 'Undo') : (currentLang === 'ar' ? 'تم الحل' : 'Resolve')}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('tableSummaryText').innerText = `إجمالي المعروض: ${data.length} من إجمالي ${auditResults.length}`;
+        }
+
+        function toggleResolved(escapedKey) {
+            const key = unescape(escapedKey);
+            if (resolvedSkus.has(key)) {
+                resolvedSkus.delete(key);
+            } else {
+                resolvedSkus.add(key);
+            }
+            processAuditData();
+        }
+
+        function resetSession() {
+            rawCrmData = [];
+            rawStoreData = [];
+            auditResults = [];
+            resolvedSkus.clear();
+            document.getElementById('crmStatusBadge').classList.add('hidden');
+            document.getElementById('storeStatusBadge').classList.add('hidden');
+            document.getElementById('crmFileName').innerText = i18n[currentLang].uploadPrompt;
+            document.getElementById('storeFileName').innerText = i18n[currentLang].uploadPrompt;
+            processAuditData();
+        }
+
+        function exportReport() {
+            if (auditResults.length === 0) return;
+
+            const exportData = auditResults.map(r => ({
+                "SKU / Serial": r.SKU || "N/A",
+                "Product Title": r.Title,
+                "CRM Stock": r.Stock,
+                "CRM Price (DA)": r.Price,
+                "Ouedkniss Price (DA)": r.StorePrice || "Unposted",
+                "Difference (DA)": r.Diff || 0,
+                "Status": r.StatusLabel,
+                "Notes": r.Note
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "El_Assli_HiTech_Audit");
+
+            XLSX.writeFile(workbook, `El_Assli_HiTech_Audit_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+    </script>
+</body>
+</html>
